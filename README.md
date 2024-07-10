@@ -1,4 +1,4 @@
-# ESP32 Secure Vault Project
+# ESP32 XLock. Generate secure key material based on PUF extractor
 
 This project implements a secure vault system on the ESP32-C3 microcontroller based on the solution proposed in the referenced paper. The project leverages Physically Unclonable Functions (PUFs) to generate and securely store cryptographic keys. The vault initialization and key generation/reconstruction procedures are implemented as described in the paper.
 
