@@ -53,3 +53,5 @@ dkms.conf
 
 build/*
 !build/build.xml
+**/.build
+**/build
