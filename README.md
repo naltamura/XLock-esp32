@@ -1,35 +1,27 @@
-| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H2 | ESP32-P4 | ESP32-S2 | ESP32-S3 |
-| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- | -------- | -------- |
+# ESP32 Secure Vault Project
 
-# _Sample project_
+This project implements a secure vault system on the ESP32-C3 microcontroller based on the solution proposed in the referenced paper. The project leverages Physically Unclonable Functions (PUFs) to generate and securely store cryptographic keys. The vault initialization and key generation/reconstruction procedures are implemented as described in the paper.
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+## Overview
 
-This is the simplest buildable example. The example is used by command `idf.py create-project`
-that copies the project to user specified path and set it's name. For more information follow the [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project)
+The secure vault system provides a method for secure key storage and retrieval using PUFs. The key features of the system include:
+
+- **PUF Response Measurement**: Extract unique, device-specific responses from a PUF.
+- **Vault Initialization**: Initialize a vault with locks and indexes derived from the PUF response.
+- **Key Generation Procedure (GEN)**: Generate cryptographic keys using the initialized vault and store auxiliary data securely.
+- **Key Reconstruction Procedure (REP)**: Reconstruct keys using a new PUF response and verify their validity.
+- **NVS Storage**: Store and retrieve critical data securely using the ESP32's Non-Volatile Storage (NVS).
+
+## Key Concepts
+
+- **PUF (Physically Unclonable Function)**: A hardware security feature that generates a unique response based on the physical characteristics of the device.
+- **Vault**: A secure storage structure containing locks and indexes to protect cryptographic keys.
+- **Locks and Indexes**: Components of the vault used in the GEN and REP procedures to generate and verify keys.
+
+## Prerequisites
+
+- ESP32-C3 microcontroller
+- ESP-IDF (Espressif IoT Development Framework) installed and configured
+- `mbedtls` library for cryptographic operations
 
 
-
-## How to use example
-We encourage the users to use the example as a template for the new projects.
-A recommended way is to follow the instructions on a [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project).
-
-## Example folder contents
-
-The project **sample_project** contains one source file in C language [main.c](main/main.c). The file is located in folder [main](main).
-
-ESP-IDF projects are built using CMake. The project build configuration is contained in `CMakeLists.txt`
-files that provide set of directives and instructions describing the project's source files and targets
-(executable, library, or both). 
-
-Below is short explanation of remaining files in the project folder.
-
-```
-├── CMakeLists.txt
-├── main
-│   ├── CMakeLists.txt
-│   └── main.c
-└── README.md                  This is the file you are currently reading
-```
-Additionally, the sample project contains Makefile and component.mk files, used for the legacy Make based build system. 
-They are not used or needed when building with CMake and idf.py.
