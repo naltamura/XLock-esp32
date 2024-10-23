@@ -133,7 +133,7 @@ void sample_spref(nvs_handle_t nvs_handle) {
     if (ret == ESP_ERR_NVS_NOT_FOUND) {
         measurement_index = 0;
     } else if (ret != ESP_OK) {
-        printf("Error (%s) reading from NVS! nvs_get_u16\n", esp_err_to_name(ret));
+        printf("Error (%s) reading meas_index from NVS! nvs_get_u16\n", esp_err_to_name(ret));
         return;
     }
 
@@ -165,10 +165,9 @@ void sample_spref(nvs_handle_t nvs_handle) {
             printf("Error (%s) committing to NVS!\n", esp_err_to_name(ret));
         }
 
-        nvs_close(nvs_handle);
+        //nvs_close(nvs_handle);
         esp_restart();
     } else {
-
 
         get_puf_responses(nvs_handle, puf_responses);
 

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
-esp_err_t initialize_nvs_and_memory(uint8_t **s_pref, uint8_t **s_read, nvs_handle_t *nvs_handle) {
+esp_err_t initialize_nvs_and_memory(uint8_t **s_pref, uint8_t **s_read, nvs_handle_t nvs_handle) {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -24,13 +24,13 @@ esp_err_t initialize_nvs_and_memory(uint8_t **s_pref, uint8_t **s_read, nvs_hand
         return ESP_ERR_NO_MEM;
     }
 
-    ret = nvs_open("storage", NVS_READWRITE, nvs_handle);
-    if (ret != ESP_OK) {
-        printf("Error (%s) opening NVS handle!\n", esp_err_to_name(ret));
-        free(*s_pref);
-        free(*s_read);
-        return ret;
-    }
+    // ret = nvs_open("storage", NVS_READWRITE, nvs_handle);
+    // if (ret != ESP_OK) {
+    //     printf("Error (%s) opening NVS handle!\n", esp_err_to_name(ret));
+    //     free(*s_pref);
+    //     free(*s_read);
+    //     return ret;
+    // }
 
     return ESP_OK;
 }

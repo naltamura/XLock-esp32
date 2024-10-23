@@ -22,7 +22,7 @@ uint8_t get_majority_value(uint8_t *values, int length) {
     return majority;
 }
 //#define LOG_GEN
-void calculate_k_pre(uint8_t* k_pre, uint8_t* s_read, vault_t* vault, int* indexes, size_t key_size, size_t num_locks, size_t xor_size) {
+void calculate_k_pre(uint8_t* k_pre, uint8_t* s_read, vault_t* vault, uint8_t* indexes, size_t key_size, size_t num_locks, size_t xor_size) {
     
      #ifdef LOG_GEN
     printf("calculate_k_pre inputs:\n");
@@ -78,22 +78,16 @@ void calculate_k_pre(uint8_t* k_pre, uint8_t* s_read, vault_t* vault, int* index
 
 }
 
-void gen_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t C, uint8_t *K, uint8_t *n, int *R, size_t key_size, uint8_t *T) {
+void gen_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t C, uint8_t *K, uint8_t *n, uint8_t *R, size_t key_size, uint8_t *T) {
     // Generate nonce
+    uint8_t K_pre[key_size];
     *n = esp_random() & 0xFF;  // Generate a single byte nonce
+    
+    printf("n: %02x\n", *n);
 
     // Draw unique key indexes
     draw_unique_indexes(R, key_size, B_size);
-    uint8_t K_pre[key_size];
-
     calculate_k_pre(K_pre, S_read, V, R, key_size, L, C);
-
-
-    printf("gen_procedure K_pre: ");
-    for (size_t i = 0; i < key_size; i++) {
-        printf("%02x", K_pre[i]);
-    }
-    printf("\n");
 
     // Hash K_pre and nonce to get K
     mbedtls_sha256_context ctx;
@@ -104,25 +98,54 @@ void gen_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t 
     mbedtls_sha256_finish(&ctx, K);
     mbedtls_sha256_free(&ctx);
 
+    printf("\n");
+    printf("Generated K: ");
+        for (int i = 0; i < KEY_SIZE; i++) {
+            printf("%02x", K[i]);
+        }
+    printf("\n");
+    printf("Generated K: ");
+        for (int i = 0; i < KEY_SIZE; i++) {
+            printf("%d", K[i]);
+        }
+    printf("\n");
+
+
     // Hash K and R to get T
     mbedtls_sha256_init(&ctx);
     mbedtls_sha256_starts(&ctx, 0);
-    mbedtls_sha256_update(&ctx, K, KEY_SIZE);
+    mbedtls_sha256_update(&ctx, K, key_size);
     mbedtls_sha256_update(&ctx, R, key_size);
     mbedtls_sha256_finish(&ctx, T);
     mbedtls_sha256_free(&ctx);
+
+    printf("\nT: ");
+    for (size_t i = 0; i < key_size; i++) {
+        printf("%02x ", T[i]);
+    }
+    printf("\n");
+    
+    printf("R final print: ");
+    for (size_t i = 0; i < key_size; i++) {
+        printf("%u", R[i]);
+    }
+    printf("\n");
+    
 }
 
-void store_gen_values(nvs_handle_t nvs_handle, int *R, uint8_t *T, uint8_t n, size_t key_size) {
+void store_gen_values(nvs_handle_t nvs_handle, uint8_t *R, uint8_t *T, uint8_t n, size_t key_size) {
     esp_err_t err;
-
+    esp_err_t ret  = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+    if (ret != ESP_OK) {
+        printf("Error (%s) opening NVS handle!\n", esp_err_to_name(ret));;
+        return ;
+    }
     printf("Storing values in NVS:\n");
     printf("R: ");
     for (size_t i = 0; i < key_size; i++) {
-        printf("%d ", R[i]);
+        printf("%u", R[i]);
     }
     printf("\n");
-
     printf("T: ");
     for (size_t i = 0; i < key_size; i++) {
         printf("%02x ", T[i]);
@@ -131,7 +154,7 @@ void store_gen_values(nvs_handle_t nvs_handle, int *R, uint8_t *T, uint8_t n, si
 
     printf("n: %02x\n", n);
 
-    err = nvs_set_blob(nvs_handle, "gen_R", R, key_size * sizeof(int));
+    err = nvs_set_blob(nvs_handle, "gen_R", R, key_size * sizeof(uint8_t));
     if (err != ESP_OK) {
         printf("Error (%s) storing R in NVS!\n", esp_err_to_name(err));
     }
@@ -147,11 +170,14 @@ void store_gen_values(nvs_handle_t nvs_handle, int *R, uint8_t *T, uint8_t n, si
     }
 
     nvs_commit(nvs_handle);
+    nvs_close(nvs_handle);
 }
 
 
 
-void retrieve_gen_values(nvs_handle_t nvs_handle, int *R, uint8_t *T, uint8_t *n, size_t key_size) {
+void retrieve_gen_values(nvs_handle_t nvs_handle, uint8_t *R, uint8_t *T, uint8_t *n, size_t key_size) {
+    esp_err_t ret  = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+
     esp_err_t err;
     size_t required_size;
 
@@ -187,5 +213,6 @@ void retrieve_gen_values(nvs_handle_t nvs_handle, int *R, uint8_t *T, uint8_t *n
     } else {
         printf("n: %02x\n", *n);
     }
+    nvs_close(nvs_handle);
 }
 

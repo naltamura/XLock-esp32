@@ -19,6 +19,6 @@
 #include "vault.h"
 #include "gen.h"
 
-bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t C, uint8_t *n, int *R, size_t key_size, uint8_t *T, uint8_t *K);
+bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t C, uint8_t *n, uint8_t *R, size_t key_size, uint8_t *T, uint8_t *K);
 
 #endif

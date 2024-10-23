@@ -17,13 +17,16 @@
 #include "spref.h"
 #include "mbedtls/sha256.h"
 #include "esp_random.h"
+#include "mbedtls/ecp.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/entropy.h"
 
 
 
 
 typedef struct {
     uint8_t lock;  // XOR result for each bit in B
-    int indexes[BITS_PER_XOR];  // Indexes for XOR
+    uint8_t indexes[BITS_PER_XOR];  // Indexes for XOR
 } lock_t;
 
 typedef struct {
@@ -35,7 +38,7 @@ typedef struct {
 } vault_t;
 
 
-void draw_unique_indexes(int *indexes, size_t index_count, size_t max_value);
+void draw_unique_indexes(uint8_t *indexes, size_t index_count, size_t max_value);
 vault_t* init_vault(uint8_t *s_pref, size_t s_pref_size, size_t b_size, size_t L, size_t C);
 void store_vault(vault_t *vault, nvs_handle_t nvs_handle, size_t b_size, size_t L, size_t C);
 void print_vault(vault_t *vault, size_t b_size, size_t L, size_t C);

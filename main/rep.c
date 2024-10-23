@@ -1,7 +1,7 @@
 #include "rep.h"
 
 #define REP_LOG;
-bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t C, uint8_t *n, int *R, size_t key_size, uint8_t *T, uint8_t *K) {
+bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t C, uint8_t *n, uint8_t *R, size_t key_size, uint8_t *T, uint8_t *K) {
     // Generate K_pre
 
     #ifdef REP_LOG
@@ -21,10 +21,10 @@ bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t 
     //         printf("\n");
     //     }
     // }
-    printf("nonce (n): %02x\n", *n);
+    printf("\nnonce (n): %02x\n", *n);
     printf("R: ");
     for (size_t i = 0; i < key_size; i++) {
-        printf("%d ", R[i]);
+        printf("%u ", R[i]);
     }
     printf("\nT: ");
     for (size_t i = 0; i < K_SIZE; i++) {
@@ -35,13 +35,7 @@ bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t 
 
     uint8_t K_pre[key_size];
 
-    calculate_k_pre(K_pre, S_read, V, (int*)R, key_size, L, C);
-
-    printf("rep_procedure K_pre: ");
-    for (size_t i = 0; i < key_size; i++) {
-        printf("%02x", K_pre[i]);
-    }
-    printf("\n");
+    calculate_k_pre(K_pre, S_read, V,R, key_size, L, C);
 
     // Hash K_pre and nonce to get K
     mbedtls_sha256_context ctx;
@@ -52,14 +46,20 @@ bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t 
     mbedtls_sha256_finish(&ctx, K);
     mbedtls_sha256_free(&ctx);
     
+    printf("\n");
     printf("Generated K: ");
         for (int i = 0; i < KEY_SIZE; i++) {
-            printf("%02x", K[i]);
+            printf("%x", K[i]);
+        }
+    printf("\n");
+    printf("Generated K: ");
+        for (int i = 0; i < KEY_SIZE; i++) {
+            printf("%u", K[i]);
         }
     printf("\n");
 
     // Hash K and R to get T'
-    uint8_t T_prime[K_SIZE];
+    uint8_t T_prime[32];
     mbedtls_sha256_init(&ctx);
     mbedtls_sha256_starts(&ctx, 0);
     mbedtls_sha256_update(&ctx, K, K_SIZE);

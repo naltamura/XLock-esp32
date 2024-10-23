@@ -114,39 +114,39 @@ void app_main(void) {
         #endif
 
         #ifdef REP_PROCEDURE
-            ret = initialize_nvs_and_memory(&s_pref, &s_read, &nvs_handle);
-            vault_t *retrieved_vault = get_vault(nvs_handle, RANDOM_POOL_BITS, LOCKS_PER_BIT, BITS_PER_XOR);
-            //print_vault(retrieved_vault, RANDOM_POOL_BITS, LOCKS_PER_BIT, BITS_PER_XOR);
-            vTaskDelay(100);
-            
-            retrieve_gen_values(nvs_handle, R, T, &n, K_SIZE);
+                ret = initialize_nvs_and_memory(&s_pref, &s_read, &nvs_handle);
+                vault_t *retrieved_vault = get_vault(nvs_handle, RANDOM_POOL_BITS, LOCKS_PER_BIT, BITS_PER_XOR);
+                //print_vault(retrieved_vault, RANDOM_POOL_BITS, LOCKS_PER_BIT, BITS_PER_XOR);
+                vTaskDelay(100);
+                
+                retrieve_gen_values(nvs_handle, R, T, &n, K_SIZE);
 
-            measure_puf_response(s_read_prime);
-            
-            #ifdef LOG_MAIN
-                // Print S_read
-                printf("S_read_rep: ");
-                for (int i = 0; i < PUF_RESPONSE_BYTES; i++) {
-                printf("%02x", s_read_prime[i]);
+                measure_puf_response(s_read_prime);
+                
+                #ifdef LOG_MAIN
+                    // Print S_read
+                    printf("S_read_rep: ");
+                    for (int i = 0; i < PUF_RESPONSE_BYTES; i++) {
+                    printf("%02x", s_read_prime[i]);
+                    }
+                    printf("\n");
+                #endif  
+                
+                
+                // Execute the REP procedure
+                bool is_valid = rep_procedure(s_read_prime, retrieved_vault, RANDOM_POOL_BITS, LOCKS_PER_BIT, BITS_PER_XOR, &n, R, K_SIZE, T, K);
+
+                
+                if (is_valid) {
+                    printf("The response is valid!\n");
+                } else {
+                    printf("The response is invalid!\n");
                 }
-                printf("\n");
-            #endif  
-            
-            
-            // Execute the REP procedure
-            bool is_valid = rep_procedure(s_read_prime, retrieved_vault, RANDOM_POOL_BITS, LOCKS_PER_BIT, BITS_PER_XOR, &n, R, K_SIZE, T, K);
-
-            
-            if (is_valid) {
-                printf("The response is valid!\n");
-            } else {
-                printf("The response is invalid!\n");
-            }
-            vTaskDelay(500);
-            
-            free_vault(retrieved_vault, RANDOM_POOL_BITS);
-            free(s_pref);
-            free(s_read);
+                vTaskDelay(500);
+                
+                free_vault(retrieved_vault, RANDOM_POOL_BITS);
+                free(s_pref);
+                free(s_read);
         
         #endif
 

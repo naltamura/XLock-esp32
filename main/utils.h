@@ -12,7 +12,7 @@
 #include "nvs.h"
 #include "definitions.h"
 
-esp_err_t initialize_nvs_and_memory(uint8_t **s_pref, uint8_t **s_read, nvs_handle_t *nvs_handle);
+esp_err_t initialize_nvs_and_memory(uint8_t **s_pref, uint8_t **s_read, nvs_handle_t nvs_handle);
 void noise_reduction(uint8_t **puf_responses, uint8_t *s_pref);
 float calculate_bit_entropy(uint8_t *data, int length);
 void evaluate_puf_response(uint8_t *puf_response);
