@@ -49,7 +49,7 @@ bool rep_procedure(uint8_t *S_read, vault_t *V, size_t B_size, size_t L, size_t 
     printf("\n");
     printf("Generated K: ");
         for (int i = 0; i < KEY_SIZE; i++) {
-            printf("%x", K[i]);
+            printf("%02x", K[i]);
         }
     printf("\n");
     printf("Generated K: ");
